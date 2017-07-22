@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", () => {
+        const audioCtx = new window.AudioContext();
+
+        const oscillator1 = audioCtx.createOscillator();
+        const oscillator2 = audioCtx.createOscillator();
+        const oscillator3 = audioCtx.createOscillator();
+        const oscillator4 = audioCtx.createOscillator();
+        const oscillator5 = audioCtx.createOscillator();
+        const oscillator6 = audioCtx.createOscillator();
+
+        const gain1       = audioCtx.createGain();
+        const gain2       = audioCtx.createGain();
+        const gain3       = audioCtx.createGain();
+        const gain4       = audioCtx.createGain();
+        const gain5       = audioCtx.createGain();
+        const gain6       = audioCtx.createGain();
+
+        let free = [
+          oscillator1,
+          oscillator2,
+          oscillator3,
+          oscillator4,
+          oscillator5,
+          oscillator6
+        ];
+
+        let gains = [ gain1, gain2, gain3, gain4, gain5, gain6 ];
+
+        gains.forEach((gain) => {
+          gain.gain.value = Math.floor(Math.random(575) + 50);
+        });
+
+        free.forEach((osc) => {
+          osc.type = Math.random() > 0.2 ? 'square': (Math.random() > 0.5 ? 'triangle': 'sawtooth');
+          osc.frequency.value = Math.floor(Math.random(575) + 50);
+          osc.connect(audioCtx.destination);
+          osc.start();
+        });
+
+
+        var osc1, osc2, gain;
+        document.addEventListener('mousedown', function() {
+          gain = gains.shift();
+          osc1 = free.shift();
+          osc2 = free.shift();
+
+          osc1.connect(gain);
+          gain.connect(osc2.frequency);
+        });
+
+        document.addEventListener('mousemove', function(e) {
+          if (osc1 && osc2) {
+            osc1.frequency.value = e.pageX;
+            gain = e.pageX / e.pageY;
+            osc2.frequency.value = e.pageY;
+          }
+        });
+
+        document.addEventListener('mouseup', function() {
+          free.push(osc1);
+          free.unshift(osc2);
+          gains.push(gain);
+          osc1 = null;
+          osc2 = null;
+          console.log(free);
+        });
+
+      });
+    </script>
+  </head>
+  <body>
+      <div></div>
+  </body>
+</html>
+
